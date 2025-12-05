@@ -1,0 +1,6 @@
+*.txt
+
+
+# Added by cargo
+
+*/target
