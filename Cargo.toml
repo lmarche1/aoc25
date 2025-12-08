@@ -1,0 +1,16 @@
+[package]
+name = "aoc25"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.100"
+
+[lib]
+name = "shared_functions"
+path = "src/lib.rs"
+
+[[bin]]
+name = "day01"
+path = "src/day01.rs"
+
