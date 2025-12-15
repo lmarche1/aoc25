@@ -1,8 +1,12 @@
 use anyhow::Result;
 use shared_functions::read_one_per_line;
 
-fn main() -> Result<()> {
-    let task1: u64 = read_one_per_line::<String>("./data/input2.txt")?
+// this function is very slow and definitely optimizable
+// originally it was only used for task2
+// I changed it afterwards to also support task 1, which was solved a bit differently before
+fn sum_symmetrical_numbers(f: &dyn Fn(&u64) -> usize) -> u64 {
+    read_one_per_line::<String>("./data/input2.txt")
+        .unwrap()
         .get(0)
         .unwrap()
         .split(",")
@@ -17,19 +21,38 @@ fn main() -> Result<()> {
         })
         .into_iter()
         .filter(|number| {
-            if let Some((num1, num2)) = number
-                .to_string()
-                .split_at_checked(number.to_string().len() / 2)
-            {
-                num1 == num2
-            } else {
+            if number.to_string().len() == 1 {
                 false
+            } else {
+                (f(number)..number.to_string().len() / 2 + 1)
+                    .map(|window_size| {
+                        number
+                            .to_string()
+                            .chars()
+                            .collect::<Vec<char>>()
+                            .windows(window_size)
+                            .step_by(window_size)
+                            .collect::<Vec<&[char]>>()
+                            .windows(2)
+                            .all(|windows| {
+                                windows[0] == windows[1]
+                                    && number.to_string().len() % window_size == 0
+                            })
+                    })
+                    .any(|num| num)
             }
         })
         .collect::<Vec<u64>>()
         .into_iter()
-        .sum();
+        .sum()
+}
 
-    println!("{task1:?}");
+fn main() -> Result<()> {
+    println!(
+        "Task 1: {}",
+        sum_symmetrical_numbers(&|x| { (x.to_string().len() + 1) / 2 })
+    );
+    println!("Task 2: {}", sum_symmetrical_numbers(&|_| { 1 }));
+
     Ok(())
 }
